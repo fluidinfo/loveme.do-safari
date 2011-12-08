@@ -1,6 +1,6 @@
 var base = "http://fluidinfo.com/about/";
 var product = "Fluidinfo";
-var defaultAbout = "fluidinfo";
+var defaultAbout = "@fluidinfo";
 
 // --------------------------- Page action --------------------------
 
@@ -20,6 +20,8 @@ function handleContextMenu(event) {
         break;
     case "TEXT":
         msg += event.userInfo.about;
+        // canonicalize about values to lower-case
+        event.userInfo.about = event.userInfo.about.toLowerCase();
         break;
     default:
         // can't happen
@@ -32,8 +34,11 @@ safari.application.addEventListener("command", handleCommand, false);
 
 function handleCommand(event) {
     if (event.command === "fluidinfo") {
-        var tab = safari.application.activeBrowserWindow.openTab("foreground");
-        tab.url = makeURL(event.userInfo.about, event.userInfo.url);
+        var tab   = safari.application.activeBrowserWindow.openTab("foreground"),
+            about = event.userInfo.type === "TEXT" ?
+                event.userInfo.about.toLowerCase() :
+                event.userInfo.about;
+        tab.url = makeURL(about, event.userInfo.url);
         tab.activate();
     }
 }
