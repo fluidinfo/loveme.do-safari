@@ -3,34 +3,6 @@
 <plist version="1.0">
 <array>
 	<dict>
-		<key>Key</key>
-		<string>username</string>
-		<key>Secure</key>
-		<true/>
-		<key>Title</key>
-		<string>Username</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>Key</key>
-		<string>password</string>
-		<key>Password</key>
-		<true/>
-		<key>Secure</key>
-		<true/>
-		<key>Title</key>
-		<string>Password</string>
-		<key>Type</key>
-		<string>TextField</string>
-	</dict>
-	<dict>
-		<key>DefaultValue</key>
-		<false/>
-		<key>Key</key>
-		<string>valid</string>
-	</dict>
-	<dict>
 		<key>DefaultValue</key>
 		<string>right</string>
 		<key>Key</key>
@@ -52,17 +24,17 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<real>30</real>
+		<real>300</real>
 		<key>Key</key>
-		<string>notificationTimeout</string>
+		<string>sidebarWidth</string>
 		<key>MaximumValue</key>
-		<real>120</real>
+		<real>500</real>
 		<key>MinimumValue</key>
-		<real>0.0</real>
+		<real>200</real>
 		<key>StepValue</key>
 		<real>10</real>
 		<key>Title</key>
-		<string>Notification Timeout</string>
+		<string>Sidebar Width</string>
 		<key>Type</key>
 		<string>Slider</string>
 	</dict>

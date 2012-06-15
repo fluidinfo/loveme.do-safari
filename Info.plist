@@ -52,7 +52,6 @@
 		<key>Stylesheets</key>
 		<array>
 			<string>sidebar.css</string>
-			<string>notification.css</string>
 		</array>
 	</dict>
 	<key>Description</key>

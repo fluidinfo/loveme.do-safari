@@ -30,7 +30,11 @@ function openInSidebar(about) {
     var tab = safari.application.activeBrowserWindow.activeTab;
     tab.page.dispatchMessage('background', {
         about: about,
-        action: 'show sidebar'
+        action: 'show sidebar',
+        settings: {
+            sidebarSide: safari.extension.settings.sidebarSide,
+            sidebarWidth: safari.extension.settings.sidebarWidth
+        }
     });
 }
 
@@ -48,9 +52,8 @@ function openNewTab(about) {
 // contextMenuItems has attributes that are the text of current
 // context menu items. Its values are objects with three attributes,
 // 'context' (either 'link' or 'selection'), 'gotoMenuItem' and
-// 'sidebarMenuItem', the menu item indices returned by
-// chrome.contextMenus.create.
-
+// 'sidebarMenuItem', holding parameters for
+// event.contextMenu.appendContextMenuItem.
 var contextMenuItems = {};
 
 var addContextMenuItem = function(text, context) {

@@ -16,14 +16,6 @@ var oauthAutoCloseTabs = {};
 // something that's being followed, e.g., '@username' or 'wordnik.com'.
 var followeeRegex = /^@?([\w\.]+)$/;
 
-// -----------------  Settings -----------------
-
-// var settings = new Store('settings', {
-//     notificationTimeout: 30,
-//     sidebarSide: 'right',
-//     sidebarWidth: 300
-// });
-
 var anonFluidinfoAPI = fluidinfo({instance: 'https://' + fluidDBHost + '/'});
 
 var absoluteHref = function(linkURL, docURL) {
@@ -54,25 +46,6 @@ var absoluteHref = function(linkURL, docURL) {
     return url;
 };
 
-
-
-var createSelectionNotification = function(about) {
-    displayNotification({
-        about: about,
-        tabId: 'selection'
-    });
-};
-
-var removeSelectionNotification = function() {
-    deleteNotificationForTab('selection');
-    var port = chrome.tabs.connect(tabThatCreatedCurrentSelection, {name: 'sidebar'});
-    port.postMessage({
-        action: 'hide sidebar'
-    });
-    tabThatCreatedCurrentSelection = null;
-};
-
-
 // Listen for incoming messages from the tab content script or the sidebar
 // iframe script with events (link mouseover, link mouseout, selection
 // set/cleared, etc).
@@ -85,16 +58,12 @@ var handleMessage = function(e) {
                 currentSelection = msg.selection;
                 removeContextMenuItemsByContext('selection');
                 addContextMenuItem(currentSelection, 'selection');
-                if (currentSelection.length < maxSelectionLengthToLookup) {
-                    createSelectionNotification(currentSelection);
-                }
             }
         }
         else if (msg.selectionCleared) {
             if (currentSelection !== null) {
                 currentSelection = null;
                 removeContextMenuItemsByContext('selection');
-                removeSelectionNotification();
             }
         }
         else if (msg.mouseout) {
@@ -147,8 +116,17 @@ var handleMessage = function(e) {
                 }
                 addContextMenuItem(msg.text, 'link');
             }
-        }
-        else {
+        } else if (msg.toggleSidebar) {
+            var tab = safari.application.activeBrowserWindow.activeTab;
+            tab.page.dispatchMessage('background', {
+                action: 'toggle sidebar',
+                about: currentSelection || tab.url,
+                settings: {
+                    sidebarSide: safari.extension.settings.sidebarSide,
+                    sidebarWidth: safari.extension.settings.sidebarWidth
+                }
+            });
+        } else {
             console.log('Unrecognized message sent by content script:');
             console.log(msg);
         }
@@ -182,230 +160,9 @@ var handleMessage = function(e) {
 };
 safari.application.addEventListener('message', handleMessage, false);
 
-// ------------------- Listen for requests.
-
-// chrome.extension.onRequest.addListener(
-//     function(request, sender, sendResponse){
-//         if (request.action === 'get-settings'){
-//             sendResponse(settings.toObject());
-//         }
-//         else if (request.action === 'update-current-tab-url'){
-//             chrome.tabs.update(sender.tab.id, {
-//                 url: request.url
-//             });
-//         }
-//         else {
-//             console.log('Unknown request received by background page:');
-//             console.log(request);
-//         }
-//     }
-// );
-
-// -------------------- Tag values for current tab's URL --------------------
-
-// valuesCache is keyed by tab id, values are objects with a tagValueHandler
-// (as returned by makeTagValueHandler) and a JS object holding the tag paths
-// on the object.
-var valuesCache = {};
-
-var deleteValuesCacheForTab = function(tabId) {
-    if (valuesCache[tabId] !== undefined) {
-        valuesCache[tabId].tagValueHandler.ignoreFutureResults();
-        delete valuesCache[tabId];
-    }
-};
-
-var notifications = {};
-var timeouts = {};
-
-var createNotification = function(tabId) {
-    if (window.webkitNotifications) {
-        if (! notifications[tabId]) {
-            var notification = window.webkitNotifications.createHTMLNotification('notification.html');
-            notification.show();
-            notifications[tabId] = notification;
-            notification.onclose = function() {
-                deleteNotificationForTab(tabId);
-            };
-        }
-    }
-    else {
-        console.log("Notifications are not supported for this browser/OS version yet.");
-    }
-};
-
-var deleteNotificationForTab = function(tabId) {
-    if (notifications[tabId] !== undefined) {
-        if (timeouts[tabId] !== undefined) {
-            clearTimeout(timeouts[tabId]);
-            delete timeouts[tabId];
-        }
-        notifications[tabId].cancel();
-        delete notifications[tabId];
-    }
-};
-
-var displayNotification = function(options){
-    var tabId = options.tabId;
-    var about = options.about;
-
-    deleteValuesCacheForTab(tabId);
-    deleteNotificationForTab(tabId);
-    valuesCache[tabId] = {
-        tagPaths: {}, // Will be filled in in onSuccess, below.
-        tagValueHandler: makeTagValueHandler({
-            about: about,
-            session: anonFluidinfoAPI
-        })
-    };
-
-    var onError = function(result){
-        // Ignore 404 errors, which just indicate there are no tags for the object.
-        if (result.status != 404){
-            console.log('Got error from Fluidinfo fetching tags for about ' + about);
-            console.log(result);
-        }
-    };
-
-    var showFolloweeTags = function(result){
-        var onError = function(result){
-            console.log('Got error from Fluidinfo fetching anon/follows tag.');
-            console.log(result);
-        };
-
-        var onSuccess = function(following){
-            var followees = {};
-            var i;
-
-            // Get the name part of all about values that look like "@name"
-            // or a domain, as these can be considered a user that this user
-            // is following.
-            var userIsFollowingSomething = false;
-            var data = following.data;
-            for (i = 0; i < data.length; i++){
-                var match = followeeRegex.exec(data[i]['fluiddb/about']);
-                if (match !== null){
-                    var what = match[1].toLowerCase();
-                    if (what !== 'anon'){
-                        followees[what] = true;
-                        userIsFollowingSomething = true;
-                    }
-                }
-            }
-
-            if (!userIsFollowingSomething){
-                return;
-            }
-
-            // Look at the tags on the object and get the ones that have
-            // namespaces that correspond to things the user is following
-            // and that we know how to display in a custom way.
-            var tagPaths = result.data.tagPaths;
-            var neededTags = [];
-            var knownPrefixes = [];
-            var seenPrefixes = {};
-            for (i = 0; i < tagPaths.length; i++){
-                var tagPath = tagPaths[i];
-                var namespace = tagPath.slice(0, tagPath.indexOf('/'));
-                var namespaceWithSlash = namespace + '/';
-                if (followees.hasOwnProperty(namespace) &&
-                    customDisplayPrefixes.hasOwnProperty(namespaceWithSlash)){
-                    // This is one of the anon user's followees tags, and we have a custom
-                    // display function for it.
-                    neededTags.push(tagPath);
-                    if (!seenPrefixes.hasOwnProperty(namespaceWithSlash)){
-                        knownPrefixes.push(namespaceWithSlash);
-                        seenPrefixes[namespaceWithSlash] = true;
-                    }
-                }
-            }
-
-            if (knownPrefixes.length > 0 && neededTags.length > 0){
-                valuesCache[tabId].tagValueHandler.get({
-                    onError: function(response){
-                        console.log('Fluidinfo API call failed:');
-                        console.log(response);
-                    },
-                    onSuccess: function(){
-
-                        createNotification(tabId, 'followees');
-
-                        var timeout = settings.get('notificationTimeout');
-                        if (timeout){
-                            var hide = function(){
-                                deleteNotificationForTab(tabId, 'followees');
-                            };
-                            if (! timeouts.hasOwnProperty(tabId)){
-                                timeouts[tabId] = {};
-                            }
-                            timeouts[tabId] = setTimeout(hide, timeout * 1000);
-                        }
-
-                        var populate = function(){
-                            var found = false;
-                            var info = tabId + '_followees';
-                            chrome.extension.getViews({type: 'notification'}).forEach(function(win){
-                                // Populate any new notification window (win._fluidinfo_info undefined)
-                                // or re-populate if win._fluidinfo_info is the current tabId (in which
-                                // case we are processing a reload).
-                                if (!found &&
-                                    (win._fluidinfo_info === undefined || win._fluidinfo_info === info)){
-                                    if (win.populate){
-                                        win._fluidinfo_info = info;
-                                        win.populate({
-                                            about: about,
-                                            knownPrefixes: knownPrefixes,
-                                            tabId: (tabId === 'selection' ? tabThatCreatedCurrentSelection : tabId),
-                                            tagValueHandler: valuesCache[tabId].tagValueHandler
-                                        });
-                                        found = true;
-                                    }
-                                }
-                            });
-
-                            if (!found){
-                                setTimeout(populate, 50);
-                            }
-                        };
-
-                        setTimeout(populate, 50);
-                    },
-                    tags: neededTags
-                });
-            }
-        };
-
-        // Get the about values from the objects the anon user follows.
-        anonFluidinfoAPI.query({
-            select: ['fluiddb/about'],
-            where: ['has anon/follows'],
-            onError: onError,
-            onSuccess: onSuccess
-        });
-    };
-
-    var onSuccess = function(result){
-        showFolloweeTags(result);
-    };
-
-    // Pull back tag paths on the object for the current about value. Do
-    // this as the anonymous user to make sure we don't send identifying
-    // info with lookups. Only publicly readable tags will be returned as
-    // a result.
-    anonFluidinfoAPI.api.get({
-        path: ['about', valueUtils.lowercaseAboutValue(about)],
-        onError: onError,
-        onSuccess: onSuccess
-    });
-};
-
+// Listen for tab-closed events.
 var handleClose = function(e) {
     var tab = e.target;
-    deleteValuesCacheForTab(tab);
-    deleteNotificationsForTab(tab);
-    if (tab === tabThatCreatedCurrentSelection) {
-        removeSelectionNotification();
-    }
     // An OAuth login tab that's being closed should no longer be marked
     // for auto deletion.
     if (oauthAutoCloseTabs.hasOwnProperty(tab)) {
@@ -415,6 +172,7 @@ var handleClose = function(e) {
 // We have to capture the `close' event.
 safari.application.addEventListener('close', handleClose, true);
 
+// Listen for navigation events. These are sent when a page has finished loading.
 var handleNavigate = function(e) {
     var tab = e.target;
     if (oauthAutoCloseTabs.hasOwnProperty(tab)) {
@@ -441,15 +199,8 @@ var handleNavigate = function(e) {
             // The tab has gone on to do something else (i.e., it is no
             // longer doing oauth stuff). Unmark it as a candidate for
             // automatic deletion.
-            console.log('deleting reference to tab:');
             delete oauthAutoCloseTabs[tab];
         }
-    }
-    else {
-        displayNotification({
-            about: tab.url,
-            tab: tab
-        });
     }
 };
 // We have to capture the `navigate' event.
@@ -458,12 +209,15 @@ safari.application.addEventListener('navigate', handleNavigate, true);
 
 // Set up the click listener on the extension icon.
 var handleCommand = function(e) {
-    console.log(e);
     if (e.command === 'toggle-sidebar') {
         var tab = safari.application.activeBrowserWindow.activeTab;
         tab.page.dispatchMessage('background', {
-                action: 'toggle sidebar',
-                about: currentSelection || tab.url
+            action: 'toggle sidebar',
+            about: currentSelection || tab.url,
+            settings: {
+                sidebarSide: safari.extension.settings.sidebarSide,
+                sidebarWidth: safari.extension.settings.sidebarWidth
+            }
         });
     } else if (e.command === 'open-sidebar') {
         openInSidebar(e.userInfo.about);

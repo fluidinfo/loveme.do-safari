@@ -1,9 +1,9 @@
 var valueUtils = {
     numberRegex: /^\s*[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?\s*$/,
     uriRegex: /^([a-z][-+.a-z0-9]{0,11}):\/\/(.+)/i,
-    lowercaseAboutValue: function(str){
+    lowercaseAboutValue: function(str) {
         var match = this.uriRegex.exec(str);
-        if (match){
+        if (match) {
             var scheme = match[1];
             var postScheme = match[2];
             var userpass = '';
@@ -11,7 +11,7 @@ var valueUtils = {
             var rest = '';
             var slash = postScheme.indexOf('/');
 
-            if (slash > -1){
+            if (slash > -1) {
                 rest = postScheme.slice(slash);
                 var hierarchicalPart = postScheme.slice(0, slash);
             }
@@ -36,31 +36,28 @@ var valueUtils = {
             return str.toLowerCase();
         }
     },
-    isChromeURL: function(url){
-        return url.slice(0, 9) === 'chrome://' || url.slice(0, 18) === 'chrome-devtools://';
-    },
-    truncateAbout: function(about, maxLen){
+    truncateAbout: function(about, maxLen) {
         // Return a shortened form of 'about' of length at most maxLen, suitable
         // for display.
-        if (valueUtils.isLink(about)){
+        if (valueUtils.isLink(about)) {
             // Chop off useless https?:// prefix.
             var match = about.indexOf('://');
-            if (match > -1 && match < 6){
+            if (match > -1 && match < 6) {
                 about = about.slice(match + 3);
             }
         }
-        if (about.length > maxLen){
+        if (about.length > maxLen) {
             about = about.slice(0, maxLen - 3) + '...';
         }
 
         return about;
     },
-    quoteAbout: function(s){
+    quoteAbout: function(s) {
         // Quote an about value to make it suitable for use in a
         // fluiddb/about = " ... " query.
         return s.replace(/\\/g, '\\\\').replace(/\"/g, '\"');
     },
-    isLink: function(str){
+    isLink: function(str) {
         // Return true if str looks like an https?:// link. Don't allow < or >
         // to appear, as a simple form of preventing html tags (like <script>)
         // tricking us into thinking they're normal links.

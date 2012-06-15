@@ -1,7 +1,4 @@
-var settings = {
-    sidebarSide: 'right',
-    sidebarWidth: 300
-};
+var settings = null;
 
 var hideSidebar = function(sidebar) {
     var options = {};
@@ -60,21 +57,6 @@ var createSidebar = function(callback) {
         sidebar.title = 'Fluidinfo sidebar';
         parent.appendChild(sidebar);
         callback(sidebar);
-        // Get the current settings so we know what style & size to use.
-        // chrome.extension.sendRequest(
-        //     {action: 'get-settings'},
-        //     function(result){
-        //         settings = result;
-        //         var sidebar = document.createElement('iframe');
-        //         sidebar.id = 'fi_sidebar';
-        //         sidebar.classList.add('fluidinfo_sidebar');
-        //         sidebar.classList.add('fluidinfo_sidebar_' + settings.sidebarSide);
-        //         sidebar.setAttribute('width', settings.sidebarWidth + 'px');
-        //         sidebar.title = 'Fluidinfo sidebar';
-        //         parent.appendChild(sidebar);
-        //         callback(sidebar);
-        //     }
-        // );
     }
     else {
         console.log('Could not find body or html element on page!');
@@ -90,6 +72,7 @@ var handleMessage = function(e) {
     }
     var sidebar, msg = e.message;
     if (msg.action === 'show sidebar') {
+        settings = settings || msg.settings;
         sidebar = getSidebar();
         if (sidebar) {
             updateSidebar(sidebar, valueUtils.lowercaseAboutValue(e.message.about));
@@ -111,6 +94,7 @@ var handleMessage = function(e) {
         }
     }
     else if (msg.action === 'toggle sidebar') {
+        settings = settings || msg.settings;
         toggleSidebar(valueUtils.lowercaseAboutValue(e.message.about));
     }
     else {
@@ -123,11 +107,11 @@ safari.self.addEventListener('message', handleMessage, false);
 // Allow toggling the display of the sidebar via Control-Shift-f
 shortcut.add('Ctrl+Shift+F', function() {
     console.log('Received Ctrl+Shift+F');
-    toggleSidebar(document.location.toString());
+    safari.self.tab.dispatchMessage('content', {toggleSidebar: true});
 });
 
 // Allow toggling the display of the sidebar via Control-Shift-f
-shortcut.add('Ctrl+Shift+Z', function(){
+shortcut.add('Ctrl+Shift+Z', function() {
     console.log('Received Ctrl+Shift+Z');
-    toggleSidebar(document.location.toString());
+    safari.self.tab.dispatchMessage('content', {toggleSidebar: true});
 });
