@@ -465,6 +465,10 @@ var handleCommand = function(e) {
                 action: 'toggle sidebar',
                 about: currentSelection || tab.url
         });
+    } else if (e.command === 'open-sidebar') {
+        openInSidebar(e.userInfo.about);
+    } else if (e.command === 'open-tab') {
+        openNewTab(e.userInfo.about);
     } else {
         console.log('Got an unknown command:');
         console.log(e.command);

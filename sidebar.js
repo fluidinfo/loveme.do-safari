@@ -3,15 +3,15 @@ var settings = {
     sidebarWidth: 300
 };
 
-var hideSidebar = function(sidebar){
+var hideSidebar = function(sidebar) {
     var options = {};
     options[settings.sidebarSide] = -1 * settings.sidebarWidth;
-    $(sidebar).animate(options, 500, function(){
+    $(sidebar).animate(options, 500, function() {
         $(sidebar).css('display', 'none');
     });
 };
 
-var showSidebar = function(sidebar){
+var showSidebar = function(sidebar) {
     var options = {};
     options[settings.sidebarSide] = 0;
     $(sidebar).css(settings.sidebarSide, '-' + settings.sidebarWidth + 'px')
@@ -19,25 +19,18 @@ var showSidebar = function(sidebar){
         .animate(options, 500);
 };
 
-var getSidebar = function(){
+var getSidebar = function() {
     return document.getElementById('fi_sidebar');
 };
 
 var updateSidebar = function(sidebar, about) {
     sidebar.src = 'http://' + fluidinfoHost + '/infomaniac/' + encodeURIComponent(about);
-    // sidebar.onload = function(){
-    //     safari.self.tab.dispatchMessage('content-script', {
-    //         injectSidebarJS: true,
-    //         url: document.location.toString()
-    //     });
-    // };
 };
 
-var toggleSidebar = function(about){
+var toggleSidebar = function(about) {
     var sidebar = getSidebar();
-    console.log(sidebar);
-    if (sidebar){
-        if (sidebar.style.display === 'none'){
+    if (sidebar) {
+        if (sidebar.style.display === 'none') {
             updateSidebar(sidebar, about);
             showSidebar(sidebar);
         }
@@ -48,17 +41,17 @@ var toggleSidebar = function(about){
     else {
         // There is no sidebar. Create one showing the Fluidinfo object for
         // the current document url, and display it.
-        createSidebar(function(sidebar){
+        createSidebar(function(sidebar) {
             updateSidebar(sidebar, about);
             showSidebar(sidebar);
         });
     }
 };
 
-var createSidebar = function(callback){
+var createSidebar = function(callback) {
     var parent = (document.getElementsByTagName('body')[0] ||
                   document.getElementsByTagName('html')[0]);
-    if (parent){
+    if (parent) {
         var sidebar = document.createElement('iframe');
         sidebar.id = 'fi_sidebar';
         sidebar.classList.add('fluidinfo_sidebar');
@@ -100,7 +93,9 @@ var handleMessage = function(e) {
         sidebar = getSidebar();
         if (sidebar) {
             updateSidebar(sidebar, valueUtils.lowercaseAboutValue(e.message.about));
-            showSidebar(sidebar);
+            if (sidebar.style.display === 'none') {
+                showSidebar(sidebar);
+            }
         }
         else {
             createSidebar(function(sidebar) {

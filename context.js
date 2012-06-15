@@ -39,27 +39,50 @@
 // });
 
 
+function handleContextMenu(e) {
+    switch (e.userInfo.type) {
+    case "A":
+        e.contextMenu.appendContextMenuItem('open-sidebar', 'This link in the sidebar');
+        e.contextMenu.appendContextMenuItem('open-tab', 'This link on fluidinfo.com');
+        break;
+    case "IMG":
+        e.contextMenu.appendContextMenuItem('open-sidebar', 'This image in the sidebar');
+        e.contextMenu.appendContextMenuItem('open-tab', 'This image on fluidinfo.com');
+        break;
+    case "PAGE":
+        e.contextMenu.appendContextMenuItem('open-sidebar', 'This page in the sidebar');
+        e.contextMenu.appendContextMenuItem('open-tab', 'This page on fluidinfo.com');
+        break;
+    case "TEXT":
+        e.contextMenu.appendContextMenuItem('open-sidebar', 'This text in the sidebar');
+        e.contextMenu.appendContextMenuItem('open-tab', 'This text on fluidinfo.com');
+        break;
+    default:
+        // can't happen
+        e.preventDefault();
+    }
+}
+safari.application.addEventListener('contextmenu', handleContextMenu, false);
+
 // --------------------------- Openers --------------------------
 
-function openInSidebar(about, info, tab){
+function openInSidebar(about) {
     /*
      * Open the sidebar, looking at the given about value.
      */
-    var port = chrome.tabs.connect(tab.id, {name: 'sidebar'});
-    port.postMessage({
+    var tab = safari.application.activeBrowserWindow.activeTab;
+    tab.page.dispatchMessage('background', {
         about: about,
         action: 'show sidebar'
     });
 }
 
-function openNewTab(about, info, tab){
+function openNewTab(about) {
     /*
      * Create a new tab with the object browser looking at the given about value.
      */
-    chrome.tabs.create({
-        index: tab.index + 1,
-        url: 'http://' + fluidinfoHost + '/about/' + encodeURIComponent(about)
-    });
+    var tab = safari.application.activeBrowserWindow.openTab();
+    tab.url = 'http://' + fluidinfoHost + '/about/' + encodeURIComponent(about);
 }
 
 
