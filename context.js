@@ -1,50 +1,5 @@
-// // --------------------------- Page --------------------------
-
-// chrome.contextMenus.create({
-//     'title' : 'This page in the sidebar',
-//     'type' : 'normal',
-//     'contexts' : ['page'],
-//     'onclick' : function(info, tab){
-//         openInSidebar(info.pageUrl, info, tab);
-//     }
-// });
-
-// chrome.contextMenus.create({
-//     'title' : 'This page on fluidinfo.com',
-//     'type' : 'normal',
-//     'contexts' : ['page'],
-//     'onclick' : function(info, tab){
-//         openNewTab(info.pageUrl, info, tab);
-//     }
-// });
-
-// // --------------------------- Image --------------------------
-
-// chrome.contextMenus.create({
-//     'title' : 'This image in the sidebar',
-//     'type' : 'normal',
-//     'contexts' : ['image'],
-//     'onclick' : function(info, tab){
-//         openInSidebar(info.srcUrl, info, tab);
-//     }
-// });
-
-// chrome.contextMenus.create({
-//     'title' : 'This image on fluidinfo.com',
-//     'type' : 'normal',
-//     'contexts' : ['image'],
-//     'onclick' : function(info, tab){
-//         openNewTab(info.srcUrl, info, tab);
-//     }
-// });
-
-
 function handleContextMenu(e) {
     switch (e.userInfo.type) {
-    case "A":
-        e.contextMenu.appendContextMenuItem('open-sidebar', 'This link in the sidebar');
-        e.contextMenu.appendContextMenuItem('open-tab', 'This link on fluidinfo.com');
-        break;
     case "IMG":
         e.contextMenu.appendContextMenuItem('open-sidebar', 'This image in the sidebar');
         e.contextMenu.appendContextMenuItem('open-tab', 'This image on fluidinfo.com');
@@ -53,13 +8,15 @@ function handleContextMenu(e) {
         e.contextMenu.appendContextMenuItem('open-sidebar', 'This page in the sidebar');
         e.contextMenu.appendContextMenuItem('open-tab', 'This page on fluidinfo.com');
         break;
-    case "TEXT":
-        e.contextMenu.appendContextMenuItem('open-sidebar', 'This text in the sidebar');
-        e.contextMenu.appendContextMenuItem('open-tab', 'This text on fluidinfo.com');
-        break;
     default:
-        // can't happen
-        e.preventDefault();
+        for (var text in contextMenuItems) {
+            if (typeof contextMenuItems[text] !== 'undefined') {
+                var sidebar = contextMenuItems[text].sidebarMenuItem;
+                var tab = contextMenuItems[text].gotoMenuItem;
+                e.contextMenu.appendContextMenuItem(sidebar.command, sidebar.title);
+                e.contextMenu.appendContextMenuItem(tab.command, tab.title);
+            }
+        }
     }
 }
 safari.application.addEventListener('contextmenu', handleContextMenu, false);
@@ -96,27 +53,19 @@ function openNewTab(about) {
 
 var contextMenuItems = {};
 
-var addContextMenuItem = function(text, context){
+var addContextMenuItem = function(text, context) {
     // Add (possibly truncated) 'text' to the context menu, if not already present.
-    text = (text.length < 50 ? text : text.slice(0, 47) + '...').replace(/\n+/g, ' ');
+    var title = (text.length < 50 ? text : text.slice(0, 47) + '...').replace(/\n+/g, ' ');
 
-    if (typeof contextMenuItems[text] === 'undefined'){
-        var sidebarMenuItem = chrome.contextMenus.create({
-            'title' : text + ' in the sidebar',
-            'type' : 'normal',
-            'contexts' : [context],
-            'onclick' : function(info, tab){
-                openInSidebar(text, info, tab);
-            }
-        });
-        var gotoMenuItem = chrome.contextMenus.create({
-            'title' : text + ' on fluidinfo.com',
-            'type' : 'normal',
-            'contexts' : [context],
-            'onclick' : function(info, tab){
-                openNewTab(text, info, tab);
-            }
-        });
+    if (typeof contextMenuItems[text] === 'undefined') {
+        var sidebarMenuItem = {
+            title: title + ' in the sidebar',
+            command: 'open-sidebar:' + text
+        };
+        var gotoMenuItem = {
+            title: title + ' on fluidinfo.com',
+            command: 'open-tab:' + text
+        };
         contextMenuItems[text] = {
             context: context,
             gotoMenuItem: gotoMenuItem,
@@ -125,13 +74,10 @@ var addContextMenuItem = function(text, context){
     }
 };
 
-var removeContextMenuItemsByContext = function(context){
-    var text;
-    for (text in contextMenuItems){
+var removeContextMenuItemsByContext = function(context) {
+    for (var text in contextMenuItems) {
         if (typeof contextMenuItems[text] !== 'undefined' &&
-            contextMenuItems[text].context === context){
-            chrome.contextMenus.remove(contextMenuItems[text].gotoMenuItem);
-            chrome.contextMenus.remove(contextMenuItems[text].sidebarMenuItem);
+            contextMenuItems[text].context === context) {
             delete contextMenuItems[text];
         }
     }

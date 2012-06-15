@@ -469,6 +469,10 @@ var handleCommand = function(e) {
         openInSidebar(e.userInfo.about);
     } else if (e.command === 'open-tab') {
         openNewTab(e.userInfo.about);
+    } else if (e.command.slice(0, 13) === 'open-sidebar:') {
+        openInSidebar(e.command.slice(13));
+    } else if (e.command.slice(0, 9) === 'open-tab:') {
+        openNewTab(e.command.slice(9));
     } else {
         console.log('Got an unknown command:');
         console.log(e.command);

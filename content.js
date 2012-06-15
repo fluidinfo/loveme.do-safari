@@ -65,25 +65,18 @@ document.addEventListener('keyup', checkSelection, true);
 // Context Menu
 // -----------------------------------------------------------------------
 var handleContextMenu = function(e) {
-    console.log(e);
+    checkSelection();
     var userInfo = {};
     switch (e.target.nodeName) {
-    case "A":
-        userInfo.about = e.target.href;
-        userInfo.type = "A";
-        break;
-    case "IMG":
+    case 'IMG':
         userInfo.about = e.target.src;
-        userInfo.type = "IMG";
+        userInfo.type = 'IMG';
         break;
     default:
         var text = document.getSelection().toString();
-        if (text !== "") {
-            userInfo.about = valueUtils.lowercaseAboutValue(text);
-            userInfo.type = "TEXT";
-        } else {
+        if (text === '') {
             userInfo.about = document.URL;
-            userInfo.type = "PAGE";
+            userInfo.type = 'PAGE';
         }
     }
     // always add url so we can send the referrer fragment
