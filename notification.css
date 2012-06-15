@@ -1,0 +1,25 @@
+body{
+    font-family: 'Varela Round',Helvetica,Arial,sans-serif;
+    font-size: 12px;
+}
+
+a {
+    color: #08C;
+    text-decoration: none;
+}
+
+#logo {
+    float: left;
+    margin: 0px 5px 0px 0px;
+}
+
+#fi_notification_intro {
+    margin-top: 0px;
+    padding-top: 0px;
+}
+
+#fi_url_external {
+    margin-top: 0px;
+    padding-top: 0px;
+    vertical-align: top;
+}

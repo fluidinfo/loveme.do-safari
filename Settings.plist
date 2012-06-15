@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Key</key>
+		<string>username</string>
+		<key>Secure</key>
+		<true/>
+		<key>Title</key>
+		<string>Username</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>Key</key>
+		<string>password</string>
+		<key>Password</key>
+		<true/>
+		<key>Secure</key>
+		<true/>
+		<key>Title</key>
+		<string>Password</string>
+		<key>Type</key>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<false/>
+		<key>Key</key>
+		<string>valid</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>right</string>
+		<key>Key</key>
+		<string>sidebarSide</string>
+		<key>Title</key>
+		<string>Sidebar Side</string>
+		<key>Titles</key>
+		<array>
+			<string>right</string>
+			<string>left</string>
+		</array>
+		<key>Type</key>
+		<string>RadioButtons</string>
+		<key>Values</key>
+		<array>
+			<string>right</string>
+			<string>left</string>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>30</real>
+		<key>Key</key>
+		<string>notificationTimeout</string>
+		<key>MaximumValue</key>
+		<real>120</real>
+		<key>MinimumValue</key>
+		<real>0.0</real>
+		<key>StepValue</key>
+		<real>10</real>
+		<key>Title</key>
+		<string>Notification Timeout</string>
+		<key>Type</key>
+		<string>Slider</string>
+	</dict>
+</array>
+</plist>
