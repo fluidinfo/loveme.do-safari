@@ -28,7 +28,7 @@
 				<key>Identifier</key>
 				<string>fiButton</string>
 				<key>Image</key>
-				<string>images/fi-16.png</string>
+				<string>toolbar.png</string>
 				<key>Label</key>
 				<string>Fluidinfo</string>
 			</dict>

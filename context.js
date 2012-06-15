@@ -1,11 +1,11 @@
 function handleContextMenu(e) {
     switch (e.userInfo.type) {
     case "IMG":
-        e.contextMenu.appendContextMenuItem('open-sidebar', 'This image in the sidebar');
+        e.contextMenu.appendContextMenuItem('open-sidebar', 'This image in the fluidinfo sidebar');
         e.contextMenu.appendContextMenuItem('open-tab', 'This image on fluidinfo.com');
         break;
     case "PAGE":
-        e.contextMenu.appendContextMenuItem('open-sidebar', 'This page in the sidebar');
+        e.contextMenu.appendContextMenuItem('open-sidebar', 'This page in the fluidinfo sidebar');
         e.contextMenu.appendContextMenuItem('open-tab', 'This page on fluidinfo.com');
         break;
     default:
@@ -62,7 +62,7 @@ var addContextMenuItem = function(text, context) {
 
     if (typeof contextMenuItems[text] === 'undefined') {
         var sidebarMenuItem = {
-            title: title + ' in the sidebar',
+            title: title + ' in the fluidinfo sidebar',
             command: 'open-sidebar:' + text
         };
         var gotoMenuItem = {
