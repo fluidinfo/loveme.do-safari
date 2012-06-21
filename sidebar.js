@@ -1,19 +1,9 @@
-var settings = null;
-
 var hideSidebar = function(sidebar) {
-    var options = {};
-    options[settings.sidebarSide] = -1 * settings.sidebarWidth;
-    $(sidebar).animate(options, 500, function() {
-        $(sidebar).css('display', 'none');
-    });
+    $(sidebar).remove();
 };
 
 var showSidebar = function(sidebar) {
-    var options = {};
-    options[settings.sidebarSide] = 0;
-    $(sidebar).css(settings.sidebarSide, '-' + settings.sidebarWidth + 'px')
-        .css('display', 'block')
-        .animate(options, 500);
+    $(sidebar).css('display', 'block');
 };
 
 var getSidebar = function() {
@@ -24,28 +14,22 @@ var updateSidebar = function(sidebar, about) {
     sidebar.src = 'http://' + fluidinfoHost + '/infomaniac/' + encodeURIComponent(about);
 };
 
-var toggleSidebar = function(about) {
+var toggleSidebar = function(settings, about) {
     var sidebar = getSidebar();
     if (sidebar) {
-        if (sidebar.style.display === 'none') {
-            updateSidebar(sidebar, about);
-            showSidebar(sidebar);
-        }
-        else {
-            hideSidebar(sidebar);
-        }
+        hideSidebar(sidebar);
     }
     else {
         // There is no sidebar. Create one showing the Fluidinfo object for
         // the current document url, and display it.
-        createSidebar(function(sidebar) {
+        createSidebar(settings, function(sidebar) {
             updateSidebar(sidebar, about);
             showSidebar(sidebar);
         });
     }
 };
 
-var createSidebar = function(callback) {
+var createSidebar = function(settings, callback) {
     var parent = (document.getElementsByTagName('body')[0] ||
                   document.getElementsByTagName('html')[0]);
     if (parent) {
@@ -70,18 +54,14 @@ var handleMessage = function(e) {
     if (e.name !== 'background') {
         return;
     }
-    var sidebar, msg = e.message;
+    var sidebar, msg = e.message, settings = msg.settings;
     if (msg.action === 'show sidebar') {
-        settings = settings || msg.settings;
         sidebar = getSidebar();
         if (sidebar) {
             updateSidebar(sidebar, valueUtils.lowercaseAboutValue(e.message.about));
-            if (sidebar.style.display === 'none') {
-                showSidebar(sidebar);
-            }
         }
         else {
-            createSidebar(function(sidebar) {
+            createSidebar(settings, function(sidebar) {
                 updateSidebar(sidebar, valueUtils.lowercaseAboutValue(e.message.about));
                 showSidebar(sidebar);
             });
@@ -94,8 +74,7 @@ var handleMessage = function(e) {
         }
     }
     else if (msg.action === 'toggle sidebar') {
-        settings = settings || msg.settings;
-        toggleSidebar(valueUtils.lowercaseAboutValue(e.message.about));
+        toggleSidebar(settings, valueUtils.lowercaseAboutValue(e.message.about));
     }
     else {
         console.log('got unknown msg from background:');
