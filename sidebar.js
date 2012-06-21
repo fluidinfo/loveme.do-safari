@@ -83,14 +83,8 @@ var handleMessage = function(e) {
 };
 safari.self.addEventListener('message', handleMessage, false);
 
-// Allow toggling the display of the sidebar via Control-Shift-f
-shortcut.add('Ctrl+Shift+F', function() {
-    console.log('Received Ctrl+Shift+F');
-    safari.self.tab.dispatchMessage('content', {toggleSidebar: true});
-});
-
-// Allow toggling the display of the sidebar via Control-Shift-f
-shortcut.add('Ctrl+Shift+Z', function() {
-    console.log('Received Ctrl+Shift+Z');
+// Allow toggling the display of the sidebar via Command-Shift-f
+shortcut.add('Meta+Shift+F', function() {
+    console.log('Received Cmd+Shift+F');
     safari.self.tab.dispatchMessage('content', {toggleSidebar: true});
 });
