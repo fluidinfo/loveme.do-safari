@@ -83,8 +83,16 @@ var handleMessage = function(e) {
 };
 safari.self.addEventListener('message', handleMessage, false);
 
-// Allow toggling the display of the sidebar via Command-Shift-f
-shortcut.add('Meta+Shift+F', function() {
-    console.log('Received Cmd+Shift+F');
-    safari.self.tab.dispatchMessage('content', {toggleSidebar: true});
-});
+if (navigator.platform.indexOf("Mac") != -1) {
+    // Allow toggling the display of the sidebar via Cmd-Shift-F
+    shortcut.add('Meta+Shift+F', function() {
+        console.log('Received Cmd+Shift+F');
+        safari.self.tab.dispatchMessage('content', {toggleSidebar: true});
+    });
+} else {
+    // Allow toggling the display of the sidebar via Ctrl-Shift-F
+    shortcut.add('Ctrl+Shift+F', function() {
+        console.log('Received Ctrl+Shift+F');
+        safari.self.tab.dispatchMessage('content', {toggleSidebar: true});
+    });
+}
