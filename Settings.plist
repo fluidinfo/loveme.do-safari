@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>DefaultValue</key>
+		<string>right</string>
+		<key>Key</key>
+		<string>sidebarSide</string>
+		<key>Title</key>
+		<string>Sidebar Side</string>
+		<key>Titles</key>
+		<array>
+			<string>right</string>
+			<string>left</string>
+		</array>
+		<key>Type</key>
+		<string>RadioButtons</string>
+		<key>Values</key>
+		<array>
+			<string>right</string>
+			<string>left</string>
+		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<real>300</real>
+		<key>Key</key>
+		<string>sidebarWidth</string>
+		<key>MaximumValue</key>
+		<real>500</real>
+		<key>MinimumValue</key>
+		<real>200</real>
+		<key>StepValue</key>
+		<real>10</real>
+		<key>Title</key>
+		<string>Sidebar Width</string>
+		<key>Type</key>
+		<string>Slider</string>
+	</dict>
+</array>
+</plist>
