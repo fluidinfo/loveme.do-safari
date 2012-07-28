@@ -4,7 +4,7 @@
  *  It should only do things if it's in the sidebar frame, not
  * in the main tab code.
  */
-var close = document.getElementById('fluidinfo-sidebar-close');
+var close = document.getElementById('lovemedo-sidebar-close');
 
 if (close) {
     // Listen for requests from the background page.
