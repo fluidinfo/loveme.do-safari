@@ -14,7 +14,7 @@ if (window.top === window) {
     };
 
     var updateSidebar = function(sidebar, about) {
-        sidebar.src = 'http://' + fluidinfoHost + '/infomaniac/' + encodeURIComponent(about);
+        sidebar.src = 'http://' + lovemedoHost + '/infomaniac/' + encodeURIComponent(about);
     };
 
     var toggleSidebar = function(settings, about) {

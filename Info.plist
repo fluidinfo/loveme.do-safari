@@ -5,17 +5,17 @@
 	<key>Author</key>
 	<string>The Fluidinfo Team</string>
 	<key>Builder Version</key>
-	<string>7534.57.2</string>
+	<string>8536.25</string>
 	<key>CFBundleDisplayName</key>
-	<string>Fluidinfo</string>
+	<string>loveme.do</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.fluidinfo.extensions.safari</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0</string>
+	<string>2.1</string>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>6</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Global Page</key>
@@ -55,7 +55,7 @@
 		</array>
 	</dict>
 	<key>Description</key>
-	<string>The Fluidinfo extension makes it trivial to examine and tag anything you're looking at on the web.</string>
+	<string>The loveme.do extension makes it trivial to examine and tag anything you're looking at on the web.</string>
 	<key>ExtensionInfoDictionaryVersion</key>
 	<string>1.0</string>
 	<key>Permissions</key>
@@ -71,6 +71,6 @@
 	<key>Update Manifest URL</key>
 	<string>https://fluiddb.fluidinfo.com/about/@fluidinfo/gridaphobe/safari-extension.plist</string>
 	<key>Website</key>
-	<string>http://fluidinfo.com</string>
+	<string>http://loveme.do</string>
 </dict>
 </plist>

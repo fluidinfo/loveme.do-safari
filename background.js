@@ -140,7 +140,7 @@ var handleMessage = function(e) {
         }
         else if (msg.action === 'oauth login') {
             var createdTab = safari.application.activeBrowserWindow.openTab();
-            createdTab.url = 'http://' + fluidinfoHost + '/login/fluidinfo/';
+            createdTab.url = 'http://' + lovemedoHost + '/login/fluidinfo/';
             // Mark the tab as something we want to close automatically.
             oauthAutoCloseTabs[createdTab] = e.target;
         }
@@ -178,7 +178,7 @@ var handleNavigate = function(e) {
     if (oauthAutoCloseTabs.hasOwnProperty(tab)) {
         // This tab is a candidate for automatic closing after successful
         // OAuth login.
-        var dashboardURLPrefix = 'http://' + fluidinfoHost;
+        var dashboardURLPrefix = 'http://' + lovemedoHost;
         if (tab.url.slice(0, 39) === 'https://api.twitter.com/oauth/authorize') {
             // We're in the intermediate state, the fate of the OAuth login
             // attempt is still unknown. Do nothing.

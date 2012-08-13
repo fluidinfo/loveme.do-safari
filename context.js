@@ -43,7 +43,7 @@ function openNewTab(about) {
      * Create a new tab with the object browser looking at the given about value.
      */
     var tab = safari.application.activeBrowserWindow.openTab();
-    tab.url = 'http://' + fluidinfoHost + '/about/' + encodeURIComponent(about);
+    tab.url = 'http://' + lovemedoHost + '/about/' + encodeURIComponent(about);
 }
 
 
